@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "SolarCharge Controller",
+    "slug": "solar-charge-controller",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "solarcharge",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.example.solarchargecontroller",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        },
+        "NSLocalNetworkUsageDescription": "SolarCharge connects to the gateway on your local network."
+      }
+    },
+    "android": {
+      "package": "com.example.solarchargecontroller"
+    },
+    "splash": {
+      "backgroundColor": "#0B1220"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
