@@ -1,9 +1,12 @@
 import express from "express";
 import cors from "cors";
+import { authRouter } from "./routes/authRoutes";
 import { systemRouter } from "./routes/systemRoutes";
 import { controlRouter } from "./routes/controlRoutes";
 import { simRouter } from "./routes/simRoutes";
 import { deviceRouter } from "./routes/deviceRoutes";
+import { projectRouter } from "./routes/projectRoutes";
+import { userRouter } from "./routes/userRoutes";
 import { startSimulation } from "./services/simulationService";
 import { recordEvent } from "./services/eventService";
 
@@ -15,10 +18,13 @@ app.use(express.json({ limit: "256kb" }));
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
+app.use(authRouter);
 app.use(systemRouter);
 app.use(controlRouter);
 app.use(simRouter);
 app.use(deviceRouter);
+app.use(projectRouter);
+app.use(userRouter);
 
 // 404 fallback (after all routers).
 app.use((req, res) => {
@@ -36,6 +42,7 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(
     `\nSolarCharge mock gateway listening on http://localhost:${PORT}` +
+      `\n  POST /api/auth/login` +
       `\n  GET  /api/system/status` +
       `\n  GET  /api/panels` +
       `\n  GET  /api/batteries` +
@@ -43,6 +50,11 @@ app.listen(PORT, () => {
       `\n  POST /api/control/charge-target` +
       `\n  POST /api/control/mode` +
       `\n  POST /api/sim/{reset,fault,clear-fault}` +
+      `\n  GET  /api/project/finance` +
+      `\n  POST /api/project/simulate-energy-sale` +
+      `\n  GET  /api/users/:userId/portfolio` +
+      `\n  GET  /api/users/:userId/transactions` +
+      `\n  POST /api/users/:userId/buy-shares` +
       `\n  POST /api/device/telemetry` +
       `\n  GET  /api/device/command?deviceId=...` +
       `\n  POST /api/device/command-result\n`

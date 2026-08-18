@@ -8,13 +8,14 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { api, ApiError } from "../api/client";
-import { POLL_INTERVAL_MS } from "../api/config";
-import { SystemEvent } from "../types/system";
-import { colors, radii, spacing } from "../theme/colors";
-import { fmtTime, severityColor } from "../utils/formatting";
+import { api, ApiError } from "../../api/client";
+import { POLL_INTERVAL_MS } from "../../api/config";
+import { SystemEvent } from "../../types/system";
+import { colors, radii, spacing } from "../../theme/colors";
+import { fmtTime, severityColor } from "../../utils/formatting";
+import { RoleHeader } from "../../components/RoleHeader";
 
-export function LogsScreen() {
+export function AdminLogsScreen() {
   const [events, setEvents] = useState<SystemEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,10 +50,14 @@ export function LogsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
-      <Text style={styles.title}>Activity Log</Text>
-      <Text style={styles.subtitle}>
-        Charge target switches, fault events, and device commands.
-      </Text>
+      <View style={styles.headerWrap}>
+        <RoleHeader role="admin" />
+        <Text style={styles.title}>Activity Log</Text>
+        <Text style={styles.subtitle}>
+          Charge target switches, fault events, device commands, and
+          simulated energy sales.
+        </Text>
+      </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <FlatList
@@ -103,17 +108,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  headerWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
   title: {
     color: colors.textPrimary,
     fontSize: 28,
     fontWeight: "800",
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 13,
-    paddingHorizontal: spacing.lg,
     marginTop: 2,
     marginBottom: spacing.lg,
   },

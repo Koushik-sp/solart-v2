@@ -9,12 +9,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { api, ApiError } from "../api/client";
-import { API_BASE_URL, POLL_INTERVAL_MS } from "../api/config";
-import { OperatingMode, SystemState } from "../types/system";
-import { colors, radii, spacing } from "../theme/colors";
+import { api, ApiError } from "../../api/client";
+import { API_BASE_URL, POLL_INTERVAL_MS } from "../../api/config";
+import { OperatingMode, SystemState } from "../../types/system";
+import { colors, radii, spacing } from "../../theme/colors";
+import { RoleHeader } from "../../components/RoleHeader";
+import { useAuth } from "../../auth/AuthContext";
 
-export function SettingsScreen() {
+export function AdminSettingsScreen() {
+  const { user, logout } = useAuth();
   const [state, setState] = useState<SystemState | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -52,7 +55,7 @@ export function SettingsScreen() {
   async function reset() {
     Alert.alert(
       "Reset simulation?",
-      "This restores all panels and battery clusters to their initial demo values.",
+      "This restores all panels, battery clusters, project finance, and transactions to their initial demo values.",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -97,7 +100,16 @@ export function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <RoleHeader role="admin" />
         <Text style={styles.title}>Settings</Text>
+
+        <Section title="Account">
+          <Row
+            label={user?.displayName ?? "Admin"}
+            description={`Signed in as ${user?.username ?? "admin"} · role: admin`}
+          />
+          <Button label="Log out" onPress={logout} tone="warn" />
+        </Section>
 
         <Section title="Operating mode">
           <Row

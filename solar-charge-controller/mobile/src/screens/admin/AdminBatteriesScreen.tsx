@@ -8,14 +8,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { api, ApiError } from "../api/client";
-import { POLL_INTERVAL_MS } from "../api/config";
-import { BatteryCluster, SystemState } from "../types/system";
-import { colors, spacing } from "../theme/colors";
-import { BatteryCard } from "../components/BatteryCard";
-import { ConfirmSwitchModal } from "../components/ConfirmSwitchModal";
+import { api, ApiError } from "../../api/client";
+import { POLL_INTERVAL_MS } from "../../api/config";
+import { BatteryCluster, SystemState } from "../../types/system";
+import { colors, radii, spacing } from "../../theme/colors";
+import { BatteryCard } from "../../components/BatteryCard";
+import { ConfirmSwitchModal } from "../../components/ConfirmSwitchModal";
+import { RoleHeader } from "../../components/RoleHeader";
 
-export function BatteriesScreen() {
+export function AdminBatteriesScreen() {
   const [state, setState] = useState<SystemState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,11 +120,19 @@ export function BatteriesScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <RoleHeader role="admin" />
         <Text style={styles.title}>Battery Control</Text>
         <Text style={styles.subtitle}>
           Pick a cluster to charge. Switches are validated by the gateway and
           (when connected) by the firmware.
         </Text>
+
+        <View style={styles.simNote}>
+          <Text style={styles.simNoteText}>
+            Control actions are simulated and must not be connected to real
+            high-voltage hardware without proper safety systems.
+          </Text>
+        </View>
 
         {state.recommendedClusterId ? (
           <View style={styles.recBanner}>
@@ -182,7 +191,21 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 13,
     marginTop: 2,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  simNote: {
+    backgroundColor: "#3B2A0E",
+    borderColor: colors.warning,
+    borderWidth: 1,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  simNoteText: {
+    color: colors.warning,
+    fontSize: 12,
+    fontWeight: "600",
+    lineHeight: 17,
   },
   recBanner: {
     backgroundColor: "#0F2236",
