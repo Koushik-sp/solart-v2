@@ -62,7 +62,9 @@ export type EventType =
   | "SIMULATION_RESET"
   | "DEVICE_TELEMETRY"
   | "DEVICE_COMMAND_PENDING"
-  | "DEVICE_COMMAND_RESULT";
+  | "DEVICE_COMMAND_RESULT"
+  | "ENERGY_SALE_SIMULATED"
+  | "SHARES_PURCHASED";
 
 export interface SystemEvent {
   id: string;

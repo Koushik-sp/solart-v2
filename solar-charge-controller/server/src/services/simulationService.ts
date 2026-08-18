@@ -4,6 +4,12 @@ import {
   SystemState,
 } from "../types/system";
 import { isDeviceConnected, store, createInitialState } from "../data/mockSystem";
+import { financeStore, createInitialFinanceParams } from "../data/mockFinance";
+import {
+  transactionStore,
+  createInitialTransactions,
+} from "../data/mockTransactions";
+import { resetDemoAccounts } from "../data/mockUsers";
 
 // ---------------------------------------------------------------------------
 // SIMULATION
@@ -152,6 +158,12 @@ export function resetSimulation(): SystemState {
   store.state = createInitialState();
   store.lastDeviceTelemetryAt.clear();
   store.pendingCommands.clear();
+  // Also restore the simulated project finance, transaction history,
+  // and demo account share holdings so a demo reset returns the
+  // credits/earnings/ownership numbers to their seed values too.
+  financeStore.params = createInitialFinanceParams();
+  transactionStore.transactions = createInitialTransactions();
+  resetDemoAccounts();
   return store.state;
 }
 

@@ -7,17 +7,18 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { api, ApiError } from "../api/client";
-import { POLL_INTERVAL_MS } from "../api/config";
-import { SystemState } from "../types/system";
-import { colors, radii, spacing } from "../theme/colors";
-import { StatCard } from "../components/StatCard";
-import { BatteryCard } from "../components/BatteryCard";
-import { PanelCard } from "../components/PanelCard";
-import { fmtWatts } from "../utils/formatting";
-import { StatusBadge } from "../components/StatusBadge";
+import { api, ApiError } from "../../api/client";
+import { POLL_INTERVAL_MS } from "../../api/config";
+import { SystemState } from "../../types/system";
+import { colors, radii, spacing } from "../../theme/colors";
+import { StatCard } from "../../components/StatCard";
+import { BatteryCard } from "../../components/BatteryCard";
+import { PanelCard } from "../../components/PanelCard";
+import { formatWatts } from "../../utils/formatting";
+import { StatusBadge } from "../../components/StatusBadge";
+import { RoleHeader } from "../../components/RoleHeader";
 
-export function DashboardScreen() {
+export function AdminDashboardScreen() {
   const [state, setState] = useState<SystemState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,7 +85,8 @@ export function DashboardScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Dashboard</Text>
+        <RoleHeader role="admin" />
+        <Text style={styles.title}>Admin Dashboard</Text>
         <Text style={styles.subtitle}>
           {state.deviceConnected ? "Live device telemetry" : "Simulation mode"} •
           updated {new Date(state.timestamp).toLocaleTimeString()}
@@ -93,7 +95,7 @@ export function DashboardScreen() {
         <View style={styles.row}>
           <StatCard
             label="Solar Production"
-            value={fmtWatts(state.totalSolarPowerWatts)}
+            value={formatWatts(state.totalSolarPowerWatts)}
             accent={colors.charging}
           />
           <View style={{ width: spacing.md }} />
@@ -136,6 +138,13 @@ export function DashboardScreen() {
             label={state.deviceConnected ? "ESP32 ONLINE" : "SIM ONLY"}
             color={state.deviceConnected ? colors.charging : colors.textMuted}
           />
+        </View>
+
+        <View style={styles.simNote}>
+          <Text style={styles.simNoteText}>
+            Control actions are simulated and must not be connected to real
+            high-voltage hardware without proper safety systems.
+          </Text>
         </View>
 
         <Text style={styles.section}>Battery Clusters</Text>
@@ -193,6 +202,20 @@ const styles = StyleSheet.create({
   deviceBadgeWrap: {
     flexDirection: "row",
     marginBottom: spacing.sm,
+  },
+  simNote: {
+    backgroundColor: "#3B2A0E",
+    borderColor: colors.warning,
+    borderWidth: 1,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
+  simNoteText: {
+    color: colors.warning,
+    fontSize: 12,
+    fontWeight: "600",
+    lineHeight: 17,
   },
   muted: {
     color: colors.textMuted,

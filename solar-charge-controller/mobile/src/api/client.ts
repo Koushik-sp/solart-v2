@@ -7,6 +7,13 @@ import {
   SystemEvent,
   SystemState,
 } from "../types/system";
+import { LoginResponse } from "../types/auth";
+import {
+  BuySharesResponse,
+  CreditTransaction,
+  ProjectFinance,
+  UserPortfolio,
+} from "../types/finance";
 
 class ApiError extends Error {
   status: number;
@@ -55,6 +62,18 @@ async function request<T>(
 }
 
 export const api = {
+  // --- Auth -----------------------------------------------------------
+  async login(username: string, password: string): Promise<LoginResponse> {
+    // 401 (bad credentials) carries a structured failure body we surface
+    // to the user — treat it as an expected response, not a thrown error.
+    return request<LoginResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+      allowStatuses: [400, 401],
+    });
+  },
+
+  // --- System ---------------------------------------------------------
   async getSystemStatus(): Promise<SystemState> {
     return request<SystemState>("/api/system/status");
   },
@@ -75,6 +94,7 @@ export const api = {
     return request<{ events: SystemEvent[] }>(`/api/events?limit=${limit}`);
   },
 
+  // --- Control (admin only) ------------------------------------------
   async switchChargeTarget(
     clusterId: string,
     requestedBy = "mobile-app"
@@ -105,6 +125,49 @@ export const api = {
 
   async clearFault() {
     return request("/api/sim/clear-fault", { method: "POST" });
+  },
+
+  // --- Project finance + user portfolio (Project Credits) ------------
+  async getProjectFinance(): Promise<ProjectFinance> {
+    return request<ProjectFinance>("/api/project/finance");
+  },
+
+  async getUserPortfolio(userId: string): Promise<UserPortfolio> {
+    return request<UserPortfolio>(`/api/users/${userId}/portfolio`);
+  },
+
+  async getUserTransactions(
+    userId: string
+  ): Promise<{ userId: string; transactions: CreditTransaction[] }> {
+    return request(`/api/users/${userId}/transactions`);
+  },
+
+  async buyShares(
+    userId: string,
+    sharesToBuy: number
+  ): Promise<BuySharesResponse> {
+    // 400/404/409 carry a structured failure body (validation errors,
+    // insufficient available shares) we want to surface to the user.
+    return request<BuySharesResponse>(`/api/users/${userId}/buy-shares`, {
+      method: "POST",
+      body: JSON.stringify({ sharesToBuy }),
+      allowStatuses: [400, 404, 409],
+    });
+  },
+
+  async simulateEnergySale(
+    energySoldKWh: number,
+    pricePerKWhUSD?: number
+  ): Promise<{
+    success: boolean;
+    finance: ProjectFinance;
+    transaction: CreditTransaction;
+    portfolio: UserPortfolio;
+  }> {
+    return request("/api/project/simulate-energy-sale", {
+      method: "POST",
+      body: JSON.stringify({ energySoldKWh, pricePerKWhUSD }),
+    });
   },
 };
 
