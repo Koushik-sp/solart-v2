@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
 import { systemRouter } from "./routes/systemRoutes";
 import { controlRouter } from "./routes/controlRoutes";
@@ -11,7 +12,7 @@ const PORT = Number(process.env.PORT ?? 4000);
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "256kb" }));
+app.use(bodyParser.json({ limit: "256kb" }));
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
