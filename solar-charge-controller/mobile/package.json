@@ -25,5 +25,9 @@
     "@types/react": "~19.1.0",
     "babel-preset-expo": "~54.0.0",
     "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "decode-uri-component": "0.5.1",
+    "node-forge": "1.4.1"
   }
 }
