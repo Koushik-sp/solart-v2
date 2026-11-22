@@ -36,18 +36,34 @@ test("expo-status-bar is pinned to the 58.0.5 release", () => {
 });
 
 test("App does not use status bar APIs removed or deprecated by expo-status-bar", () => {
-  const app = fs.readFileSync(path.join(mobileDir, "App.tsx"), "utf8");
+  const sourceFiles = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.(?:ts|tsx|js|jsx)$/.test(entry.name)) sourceFiles.push(full);
+    }
+  };
+  walk(mobileDir);
 
-  for (const removed of [
+  const deprecated = [
     "setStatusBarNetworkActivityIndicatorVisible",
     "setStatusBarBackgroundColor",
     "setStatusBarTranslucent",
-  ]) {
-    assert.ok(!app.includes(removed), `App.tsx must not call ${removed}`);
-  }
+  ];
 
-  assert.ok(
-    !/<StatusBar[^>]*(?:backgroundColor|translucent)\s*=/.test(app),
-    "StatusBar must not use the deprecated background/translucency props",
-  );
+  for (const file of sourceFiles) {
+    const source = fs.readFileSync(file, "utf8");
+    for (const removed of deprecated) {
+      assert.ok(
+        !source.includes(removed),
+        `${path.relative(mobileDir, file)} must not call ${removed}`,
+      );
+    }
+    assert.ok(
+      !/<StatusBar[^>]*(?:backgroundColor|translucent)\s*=/.test(source),
+      `${path.relative(mobileDir, file)} must not use the deprecated background/translucency props`,
+    );
+  }
 });
